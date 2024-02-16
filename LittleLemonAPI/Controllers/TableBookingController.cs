@@ -2,6 +2,7 @@
 using LittleLemonAPI.Dto;
 using LittleLemonAPI.Interfaces;
 using LittleLemonAPI.Models;
+using LittleLemonAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LittleLemonAPI.Controllers
@@ -91,6 +92,33 @@ namespace LittleLemonAPI.Controllers
             }
 
             return Ok("Successfully created");
+        }
+
+        [HttpDelete("{bookingId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+
+        public IActionResult DeleteBookingTime(int bookingId)
+        {
+            if (!_TableBookingRepository.HasTableBooking(bookingId))
+            {
+                return NotFound();
+            }
+
+            var bookingToDelete = _TableBookingRepository.GetTableBooking(bookingId);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_TableBookingRepository.DeleteTableBooking(bookingToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong while deleting time");
+            }
+
+            return NoContent();
         }
     }
 }
