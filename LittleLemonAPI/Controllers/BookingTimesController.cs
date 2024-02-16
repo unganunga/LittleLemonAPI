@@ -74,6 +74,69 @@ namespace LittleLemonAPI.Controllers
             return Ok(bookingTimes);
         }
 
-        
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+
+        public IActionResult CreateBookingTime(BookingTimesDto bookingTimes)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var bookingTime = _BookingtimesRepository.GetBookingTimes()
+                .Where(b => b.Time.Trim().ToUpper() == bookingTimes.Time.TrimEnd().ToUpper()
+                && b.Date.Trim().ToUpper() == bookingTimes.Date.TrimEnd().ToUpper())
+                .FirstOrDefault();
+
+            if (bookingTime != null)
+            {
+                ModelState.AddModelError("", "Time already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var bookingTimeMap = _Mapper.Map<BookingTimes>(bookingTimes);
+
+            if (!_BookingtimesRepository.CreateBookingTime(bookingTimeMap))
+            {
+                ModelState.AddModelError("", "Something went wrong");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Time created successfully");
+        }
+
+        [HttpDelete("{timeId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+
+        public IActionResult DeleteBookingTime(int timeId) 
+        { 
+            if (!_BookingtimesRepository.TimeExists(timeId))
+            {
+                return NotFound();
+            }
+
+            var timeToDelete = _BookingtimesRepository.GetBookingTimeById(timeId);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_BookingtimesRepository.DeleteBookingTime(timeToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong while deleting time");
+            }
+
+            return NoContent();
+        }
     }
 }

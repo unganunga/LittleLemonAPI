@@ -39,7 +39,13 @@ namespace LittleLemonAPI.Repositories
 
         public bool CreateBookingTime(BookingTimes bookingTime)
         {
-            _context.BookingTimes.Add(bookingTime);
+            var bookingTimes = new BookingTimes()
+            {
+                Time = bookingTime.Time,
+                Date = bookingTime.Date,
+            };
+
+            _context.Add(bookingTimes);
 
             return Save();
         }
@@ -51,7 +57,8 @@ namespace LittleLemonAPI.Repositories
 
         public bool DeleteBookingTime(BookingTimes bookingTime)
         {
-            throw new NotImplementedException();
+            _context.Remove(bookingTime);
+            return Save();
         }
 
         public bool Save()

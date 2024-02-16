@@ -20,7 +20,7 @@ namespace LittleLemonAPI.Interfaces
 
         bool UpdateTableBooking(TableBookings tableBooking);
 
-        bool DeleteTableBooking(int id);
+        bool DeleteTableBooking(TableBookings tableBooking);
 
         bool Save();
     }

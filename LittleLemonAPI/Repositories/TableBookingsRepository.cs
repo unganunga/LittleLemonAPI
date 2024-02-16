@@ -63,9 +63,10 @@ namespace LittleLemonAPI.Repositories
             throw new NotImplementedException();
         }
 
-        public bool DeleteTableBooking(int id)
+        public bool DeleteTableBooking(TableBookings tableBooking)
         {
-            throw new NotImplementedException();
+            _context.Remove(tableBooking);
+            return Save();
         }
 
         public bool Save()
