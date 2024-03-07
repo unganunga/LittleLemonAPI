@@ -4,10 +4,10 @@
     {
         public int Id { get; set; }
 
-        public ICollection<TableBookings> tableBookings { get; set; }
+        public ICollection<TableBookings> tableBookings { get; set; } = new List<TableBookings>();
 
-        public string Time { get; set; }
+        public string Time { get; set; } = string.Empty;
 
-        public string Date { get; set; }
+        public string Date { get; set; } = string.Empty;
     }
 }
