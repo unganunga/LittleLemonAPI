@@ -1,11 +1,12 @@
 ﻿using LittleLemonAPI.Dto;
+using LittleLemonAPI.Helper;
 using LittleLemonAPI.Models;
 
 namespace LittleLemonAPI.Interfaces
 {
     public interface IbookingTimesRepository
     {
-        ICollection<BookingTimes> GetBookingTimes();
+        Task<ICollection<BookingTimes>> GetBookingTimes(BookingTimeQueryObj query);
 
         BookingTimes? GetBookingTimeById(int id);
 

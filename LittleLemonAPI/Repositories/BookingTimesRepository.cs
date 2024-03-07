@@ -1,7 +1,9 @@
 ﻿using LittleLemonAPI.Data;
 using LittleLemonAPI.Dto;
+using LittleLemonAPI.Helper;
 using LittleLemonAPI.Interfaces;
 using LittleLemonAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LittleLemonAPI.Repositories
 {
@@ -28,9 +30,36 @@ namespace LittleLemonAPI.Repositories
             return _context.BookingTimes.Where(e => e.Time == time).FirstOrDefault();
         }
 
-        public ICollection<BookingTimes> GetBookingTimes()
+        public async Task<ICollection<BookingTimes>> GetBookingTimes(BookingTimeQueryObj query)
         {
-            return _context.BookingTimes.ToList();
+            var times = _context.BookingTimes.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Date)) 
+            {
+                times = times.Where(times => times.Date.Contains(query.Date));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Time))
+            {
+                times = times.Where(times => times.Time.Contains(query.Time));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("Time", StringComparison.OrdinalIgnoreCase))
+                {
+                    times = query.IsDecsending ? times.OrderByDescending(t => t.Time) : times.OrderBy(t => t.Time);
+                }
+
+                if (query.SortBy.Equals("Date", StringComparison.OrdinalIgnoreCase))
+                {
+                    times = query.IsDecsending ? times.OrderByDescending(t => t.Time) : times.OrderBy(t => t.Time);
+                }
+            }
+
+            var skipnumber = (query.PageIndex - 1) * query.PageSize;
+
+            return await times.Skip(skipnumber).Take(query.PageSize).ToListAsync();
         }
 
         public BookingTimes? GetBookingTimeById(int id)

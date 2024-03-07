@@ -1,39 +1,42 @@
 ﻿using AutoMapper;
 using LittleLemonAPI.Dto;
+using LittleLemonAPI.Helper;
 using LittleLemonAPI.Interfaces;
 using LittleLemonAPI.Models;
-using LittleLemonAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LittleLemonAPI.Controllers
 {
-
     [Route("api/[controller]")]
     [ApiController]
     public class BookingTimesController : Controller
     {
         private readonly IbookingTimesRepository _BookingtimesRepository;
         private readonly IMapper _Mapper;
+        private readonly ILogger _logger;
 
 
-        public BookingTimesController(IbookingTimesRepository BookingTimesRepository, IMapper mapper)
+        public BookingTimesController(IbookingTimesRepository BookingTimesRepository, IMapper mapper, ILogger logger)
         {
             _BookingtimesRepository = BookingTimesRepository;
             _Mapper = mapper;
+            _logger = logger;
+
         }
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<BookingTimes>))]
 
-        public IActionResult GetBookingTimes()
+        public async Task<IActionResult> GetBookingTimes([FromQuery] BookingTimeQueryObj query)
         {
-            var bookingTimes = _Mapper.Map<List<BookingTimesDto>>(_BookingtimesRepository.GetBookingTimes());
+            var bookingTimes = await _BookingtimesRepository.GetBookingTimes(query);
+            var bookingTimesMap = _Mapper.Map<List<BookingTimesDto>>(bookingTimes);
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return Ok(bookingTimes);
+            return Ok(bookingTimesMap);
         }
 
         [HttpGet("{timeId:int}")]
@@ -63,7 +66,7 @@ namespace LittleLemonAPI.Controllers
 
         public IActionResult GetBookingTimeByDate(string timeByDate)
         {
-
+                
             var bookingTimes = _Mapper.Map<List<BookingTimesDto>>(_BookingtimesRepository.GetBookingTimeByDate(timeByDate));
 
             if (!ModelState.IsValid)
@@ -78,15 +81,18 @@ namespace LittleLemonAPI.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
 
-        public IActionResult CreateBookingTime(BookingTimesDto bookingTimes)
+        public async Task<IActionResult> CreateBookingTime(BookingTimesDto bookingTimes)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var bookingTime = _BookingtimesRepository.GetBookingTimes()
-                .Where(b => b.Time.Trim().ToUpper() == bookingTimes.Time.TrimEnd().ToUpper()
+            // GetBookingTimes takes a query object but theres no need for query string params here
+            BookingTimeQueryObj emptyQuery = new();
+            var bookingTimeTask = await _BookingtimesRepository.GetBookingTimes(emptyQuery);
+
+            var bookingTime = bookingTimeTask.Where(b => b.Time.Trim().ToUpper() == bookingTimes.Time.TrimEnd().ToUpper()
                 && b.Date.Trim().ToUpper() == bookingTimes.Date.TrimEnd().ToUpper())
                 .FirstOrDefault();
 
@@ -124,7 +130,7 @@ namespace LittleLemonAPI.Controllers
                 return NotFound();
             }
 
-            var timeToDelete = _BookingtimesRepository.GetBookingTimeById(timeId);
+            var timeToDelete = _BookingtimesRepository.GetBookingTimeById(timeId)!;
 
             if (!ModelState.IsValid)
             {
@@ -148,7 +154,7 @@ namespace LittleLemonAPI.Controllers
                 return NotFound();
             }
 
-            var timeToUpdate = _BookingtimesRepository.GetBookingTimeById(timeId);
+            var timeToUpdate = _BookingtimesRepository.GetBookingTimeById(timeId)!;
 
             if (!ModelState.IsValid)
             {
