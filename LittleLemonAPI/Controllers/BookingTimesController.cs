@@ -36,7 +36,7 @@ namespace LittleLemonAPI.Controllers
             return Ok(bookingTimes);
         }
 
-        [HttpGet("{timeId}")]
+        [HttpGet("{timeId:int}")]
         [ProducesResponseType(200, Type = typeof(BookingTimes))]
         [ProducesResponseType(400)]
 
@@ -109,10 +109,10 @@ namespace LittleLemonAPI.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return Ok("Time created successfully");
+            return CreatedAtAction(nameof(GetBookingTimeById), new {timeId = bookingTimes.Id}, bookingTimes);
         }
 
-        [HttpDelete("{timeId}")]
+        [HttpDelete("{timeId:int}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -137,6 +137,32 @@ namespace LittleLemonAPI.Controllers
             }
 
             return NoContent();
+        }
+
+        [HttpPut("{timeId:int}")]
+
+        public IActionResult UpdateBookingTime(int timeId, [FromBody] BookingTimesDto updateTime)
+        {
+            if (!_BookingtimesRepository.TimeExists(timeId))
+            {
+                return NotFound();
+            }
+
+            var timeToUpdate = _BookingtimesRepository.GetBookingTimeById(timeId);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_BookingtimesRepository.UpdateBookingTime(timeToUpdate, updateTime))
+            {
+                ModelState.AddModelError("", "Something went wrong while updating time");
+            }
+
+            var bookingTimeMap = _Mapper.Map<BookingTimesDto>(timeToUpdate);
+
+            return Ok(bookingTimeMap);
         }
     }
 }

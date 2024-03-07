@@ -1,4 +1,5 @@
 ﻿using LittleLemonAPI.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace LittleLemonAPI.Dto
 {
@@ -6,8 +7,10 @@ namespace LittleLemonAPI.Dto
     {
         public int Id { get; set; }
 
-        public string Time { get; set; }
+        [Required]
+        public string Time { get; set; } = string.Empty;
 
-        public string Date { get; set; }
+        [Required]
+        public string Date { get; set; } = string.Empty;
     }
 }

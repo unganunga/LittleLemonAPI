@@ -1,4 +1,5 @@
 ﻿using LittleLemonAPI.Data;
+using LittleLemonAPI.Dto;
 using LittleLemonAPI.Interfaces;
 using LittleLemonAPI.Models;
 
@@ -22,7 +23,7 @@ namespace LittleLemonAPI.Repositories
             return _context.BookingTimes.Where(e => e.Date == date).ToList();
         }
 
-        public BookingTimes GetBookingTimeByTime(string time)
+        public BookingTimes? GetBookingTimeByTime(string time)
         {
             return _context.BookingTimes.Where(e => e.Time == time).FirstOrDefault();
         }
@@ -32,7 +33,7 @@ namespace LittleLemonAPI.Repositories
             return _context.BookingTimes.ToList();
         }
 
-        public BookingTimes GetBookingTimeById(int id)
+        public BookingTimes? GetBookingTimeById(int id)
         {
             return _context.BookingTimes.Where(e => e.Id == id).FirstOrDefault();
         }
@@ -50,9 +51,12 @@ namespace LittleLemonAPI.Repositories
             return Save();
         }
 
-        public bool UpdateBookingTime(BookingTimes bookingTime)
+        public bool UpdateBookingTime(BookingTimes bookingTime, BookingTimesDto updateTime)
         {
-            throw new NotImplementedException();
+            bookingTime.Time = updateTime.Time;
+            bookingTime.Date = updateTime.Date;
+
+            return Save();
         }
 
         public bool DeleteBookingTime(BookingTimes bookingTime)
@@ -67,7 +71,7 @@ namespace LittleLemonAPI.Repositories
             return saved > 0;
         }
 
-        public BookingTimes GetBookingTime(string date, string time)
+        public BookingTimes? GetBookingTime(string date, string time)
         {
             return _context.BookingTimes.Where(e => e.Date == date && e.Time == time).FirstOrDefault();
         }

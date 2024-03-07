@@ -1,4 +1,5 @@
-﻿using LittleLemonAPI.Models;
+﻿using LittleLemonAPI.Dto;
+using LittleLemonAPI.Models;
 
 namespace LittleLemonAPI.Interfaces
 {
@@ -6,19 +7,19 @@ namespace LittleLemonAPI.Interfaces
     {
         ICollection<BookingTimes> GetBookingTimes();
 
-        BookingTimes GetBookingTimeById(int id);
+        BookingTimes? GetBookingTimeById(int id);
 
-        BookingTimes GetBookingTimeByTime(string time);
+        BookingTimes? GetBookingTimeByTime(string time);
 
         ICollection<BookingTimes> GetBookingTimeByDate(string date);
 
-        BookingTimes GetBookingTime(string date, string time);
+        BookingTimes? GetBookingTime(string date, string time);
 
         bool TimeExists(int id);
 
         bool CreateBookingTime(BookingTimes bookingTime);
 
-        bool UpdateBookingTime(BookingTimes bookingTime);   
+        bool UpdateBookingTime(BookingTimes bookingTime, BookingTimesDto updateTime);   
 
         bool DeleteBookingTime(BookingTimes bookingTime);
 
