@@ -66,10 +66,22 @@ namespace LittleLemonAPI.Controllers
 
         public IActionResult GetBookingTimeByDate(string timeByDate)
         {
-                
-            var bookingTimes = _Mapper.Map<List<BookingTimesDto>>(_BookingtimesRepository.GetBookingTimeByDate(timeByDate));
 
-            if (!ModelState.IsValid)
+            var bookingTimes = _Mapper.Map<List<BookingTimesDto>>(_BookingtimesRepository.GetBookingTimeByDate(timeByDate));
+            if (bookingTimes.Count == 0)
+            {
+                try
+                {
+                    string dateValue = DateTime.Parse(timeByDate).ToString("ddd");
+                    bookingTimes = _Mapper.Map<List<BookingTimesDto>>(_BookingtimesRepository.GetBookingTimeByDate(dateValue));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "date conversion failed");
+                }
+            }
+
+                if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
