@@ -2,8 +2,8 @@
 using LittleLemonAPI.Dto;
 using LittleLemonAPI.Interfaces;
 using LittleLemonAPI.Models;
-using LittleLemonAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace LittleLemonAPI.Controllers
 {
@@ -41,7 +41,6 @@ namespace LittleLemonAPI.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(TableBookings))]
         [ProducesResponseType(400)]
-
         public IActionResult GetTableBooking(int id)
         {
             if (!_TableBookingRepository.HasTableBooking(id))
@@ -83,7 +82,23 @@ namespace LittleLemonAPI.Controllers
 
             var tableBookingMap = _Mapper.Map<TableBookings>(tableBookingCreate);
 
-            tableBookingMap.BookingTimesId = _BookingTimesRepository.GetBookingTime(tableBookingCreate.Date, tableBookingCreate.Time).Id;
+            var bookingTime = _BookingTimesRepository.GetBookingTime(tableBookingCreate.Date, tableBookingCreate.Time);
+
+            if (bookingTime != null) 
+            {
+                tableBookingMap.BookingTimesId = bookingTime.Id;
+            }
+            else 
+            { 
+                string dateValue = DateTime.Parse(tableBookingCreate.Date, CultureInfo.InvariantCulture).ToString("ddd");
+                bookingTime = _BookingTimesRepository.GetBookingTime(dateValue, tableBookingCreate.Time);
+
+                if (bookingTime != null)
+                {
+                    tableBookingMap.BookingTimesId = bookingTime.Id;
+                }
+            }
+
 
             if (!_TableBookingRepository.CreateTableBooking(tableBookingMap))
             {
@@ -98,7 +113,6 @@ namespace LittleLemonAPI.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-
         public IActionResult DeleteBookingTime(int bookingId)
         {
             if (!_TableBookingRepository.HasTableBooking(bookingId))
