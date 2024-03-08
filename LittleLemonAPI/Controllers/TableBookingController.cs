@@ -2,6 +2,7 @@
 using LittleLemonAPI.Dto;
 using LittleLemonAPI.Interfaces;
 using LittleLemonAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 
@@ -26,6 +27,7 @@ namespace LittleLemonAPI.Controllers
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<TableBookings>))]
+        [Authorize]
 
         public IActionResult GetTableBookings()
         {
@@ -41,6 +43,7 @@ namespace LittleLemonAPI.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(TableBookings))]
         [ProducesResponseType(400)]
+        [Authorize]
         public IActionResult GetTableBooking(int id)
         {
             if (!_TableBookingRepository.HasTableBooking(id))
@@ -113,6 +116,7 @@ namespace LittleLemonAPI.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
+        [Authorize]
         public IActionResult DeleteBookingTime(int bookingId)
         {
             if (!_TableBookingRepository.HasTableBooking(bookingId))

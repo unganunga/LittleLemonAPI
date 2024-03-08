@@ -3,6 +3,7 @@ using LittleLemonAPI.Dto;
 using LittleLemonAPI.Helper;
 using LittleLemonAPI.Interfaces;
 using LittleLemonAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LittleLemonAPI.Controllers
@@ -92,6 +93,7 @@ namespace LittleLemonAPI.Controllers
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
+        [Authorize]
 
         public async Task<IActionResult> CreateBookingTime(BookingTimesDto bookingTimes)
         {
@@ -134,6 +136,7 @@ namespace LittleLemonAPI.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
+        [Authorize]
 
         public IActionResult DeleteBookingTime(int timeId) 
         { 
@@ -158,6 +161,7 @@ namespace LittleLemonAPI.Controllers
         }
 
         [HttpPut("{timeId:int}")]
+        [Authorize]
 
         public IActionResult UpdateBookingTime(int timeId, [FromBody] BookingTimesDto updateTime)
         {
